@@ -1,0 +1,91 @@
+.merkle-tree-viewer {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.merkle-tree-viewer svg {
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.merkle-tree-viewer .controls {
+  margin-bottom: 15px;
+}
+
+.merkle-tree-viewer button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin-right: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.merkle-tree-viewer button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.merkle-tree-viewer .node-details,
+.merkle-tree-viewer .proof-details {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.merkle-tree-viewer h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.merkle-tree-viewer ul {
+  padding-left: 20px;
+}
+
+.merkle-tree-viewer li {
+  margin-bottom: 5px;
+}
+
+/* D3 specific styles */
+.node circle {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.node:hover circle {
+  filter: brightness(1.2);
+}
+
+.link {
+  stroke-opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.node text {
+  font-size: 12px;
+  pointer-events: none;
+}
+
+/* Animation styles */
+@keyframes pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+.animating {
+  animation: pulse 1s infinite;
+}
