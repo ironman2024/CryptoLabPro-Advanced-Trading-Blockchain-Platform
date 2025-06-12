@@ -1,40 +1,80 @@
-/* Custom CSS for the Crypto Trading Dashboard */
+/* Professional Crypto Trading Dashboard Styles */
 
 /* Main styling */
 .main {
-    background-color: #0e1117;
-    color: #ffffff;
+    background-color: #ffffff;
+    color: #333333;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* Dashboard header */
 .dashboard-header {
-    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+    background: linear-gradient(90deg, #2c5364 0%, #203a43 50%, #0f2027 100%);
     padding: 1.5rem;
-    border-radius: 10px;
-    margin-bottom: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-header h1 {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.5rem;
+    color: #ffffff;
+}
+
+.dashboard-header h3 {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #ffffff;
+}
+
+.dashboard-header p {
+    font-size: 0.9rem;
+    color: #ffffff;
 }
 
 /* Card styling */
 .stCard {
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 1rem;
-    background-color: #1a1f2c;
-    transition: transform 0.3s ease;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 1.25rem;
+    background-color: #ffffff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .stCard:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 /* Metric cards */
 .metric-card {
-    background-color: #1a1f2c;
+    background-color: #ffffff;
     border-left: 4px solid #4CAF50;
-    padding: 1rem;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1.25rem;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+}
+
+.metric-card h3 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #666666;
+    margin-bottom: 0.5rem;
+}
+
+.metric-card h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: #333333;
 }
 
 .metric-card.positive {
@@ -51,82 +91,109 @@
 
 /* Button styling */
 .stButton>button {
-    background-color: #2a5298;
+    background-color: #2c5364;
     color: white;
-    border-radius: 5px;
+    border-radius: 6px;
     border: none;
-    padding: 0.5rem 1rem;
-    font-weight: bold;
-    transition: all 0.3s ease;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
 }
 
 .stButton>button:hover {
-    background-color: #1e3c72;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #203a43;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+.stButton>button:active {
+    transform: translateY(1px);
 }
 
 /* Tabs styling */
 .stTabs [data-baseweb="tab-list"] {
     gap: 2px;
+    background-color: #f5f7fa;
+    padding: 4px;
+    border-radius: 8px;
 }
 
 .stTabs [data-baseweb="tab"] {
-    background-color: #1a1f2c;
-    border-radius: 4px 4px 0 0;
+    background-color: #ffffff;
+    border-radius: 6px;
     padding: 10px 20px;
     border: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    color: #333333;
 }
 
 .stTabs [aria-selected="true"] {
-    background-color: #2a5298;
+    background-color: #2c5364;
     color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stTabs [data-baseweb="tab"]:hover:not([aria-selected="true"]) {
+    background-color: #f0f2f5;
 }
 
 /* Blockchain visualization */
 .blockchain-node {
-    background-color: #2a5298;
+    background: linear-gradient(135deg, #2c5364 0%, #203a43 100%);
     border-radius: 50%;
-    width: 60px;
-    height: 60px;
+    width: 64px;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-weight: bold;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease;
+}
+
+.blockchain-node:hover {
+    transform: scale(1.05);
 }
 
 .blockchain-connection {
     height: 2px;
-    background-color: #4CAF50;
+    background: linear-gradient(90deg, #4CAF50 0%, #2c5364 100%);
 }
 
 /* Trading signal indicators */
 .signal-buy {
     color: #4CAF50;
-    font-weight: bold;
-    padding: 10px;
-    border-radius: 5px;
+    font-weight: 600;
+    padding: 12px 16px;
+    border-radius: 6px;
     background-color: rgba(76, 175, 80, 0.1);
     border-left: 4px solid #4CAF50;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .signal-sell {
     color: #F44336;
-    font-weight: bold;
-    padding: 10px;
-    border-radius: 5px;
+    font-weight: 600;
+    padding: 12px 16px;
+    border-radius: 6px;
     background-color: rgba(244, 67, 54, 0.1);
     border-left: 4px solid #F44336;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .signal-hold {
     color: #FFC107;
-    font-weight: bold;
-    padding: 10px;
-    border-radius: 5px;
+    font-weight: 600;
+    padding: 12px 16px;
+    border-radius: 6px;
     background-color: rgba(255, 193, 7, 0.1);
     border-left: 4px solid #FFC107;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 /* Animations */
@@ -135,7 +202,7 @@
         transform: scale(1);
     }
     50% {
-        transform: scale(1.05);
+        transform: scale(1.03);
     }
     100% {
         transform: scale(1);
@@ -148,65 +215,162 @@
 
 /* Progress bar */
 .stProgress > div > div > div > div {
-    background-color: #2a5298;
+    background: linear-gradient(90deg, #2c5364 0%, #203a43 100%);
+    border-radius: 100px;
 }
 
 /* Expander styling */
 .streamlit-expanderHeader {
-    background-color: #1a1f2c;
-    border-radius: 5px;
+    background-color: #f5f7fa;
+    border-radius: 6px;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    transition: background-color 0.2s ease;
+    color: #333333;
+}
+
+.streamlit-expanderHeader:hover {
+    background-color: #e9ecef;
 }
 
 /* Table styling */
 .stTable {
-    border-radius: 5px;
+    border-radius: 8px;
     overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    color: #333333;
+}
+
+.stTable thead tr th {
+    background-color: #f5f7fa;
+    color: #333333;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.stTable tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+.stTable tbody tr:hover {
+    background-color: #f0f2f5;
 }
 
 /* Dataframe styling */
 .dataframe {
-    border-radius: 5px;
+    border-radius: 8px;
     overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    color: #333333;
+}
+
+.dataframe thead tr th {
+    background-color: #f5f7fa;
+    color: #333333;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    padding: 12px 16px;
+}
+
+.dataframe tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+.dataframe tbody tr:hover {
+    background-color: #f0f2f5;
+}
+
+.dataframe tbody tr td {
+    padding: 12px 16px;
+    color: #333333;
 }
 
 /* Form styling */
 .stForm {
-    background-color: #1a1f2c;
-    padding: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* Slider styling */
 .stSlider > div > div > div > div {
-    background-color: #2a5298;
+    background: linear-gradient(90deg, #2c5364 0%, #203a43 100%);
+}
+
+.stSlider > div > div > div {
+    background-color: rgba(44, 83, 100, 0.1);
 }
 
 /* Selectbox styling */
 .stSelectbox > div > div {
-    background-color: #1a1f2c;
-    border-radius: 5px;
+    background-color: #ffffff;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: border-color 0.2s ease;
+    color: #333333;
+}
+
+.stSelectbox > div > div:hover {
+    border-color: rgba(44, 83, 100, 0.5);
+}
+
+.stSelectbox > div > div > div {
+    font-weight: 500;
+    color: #333333;
 }
 
 /* Text input styling */
 .stTextInput > div > div > input {
-    background-color: #1a1f2c;
-    color: white;
-    border-radius: 5px;
+    background-color: #ffffff;
+    color: #333333;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    transition: border-color 0.2s ease;
+}
+
+.stTextInput > div > div > input:focus {
+    border-color: #2c5364;
+    box-shadow: 0 0 0 2px rgba(44, 83, 100, 0.1);
 }
 
 /* Number input styling */
 .stNumberInput > div > div > input {
-    background-color: #1a1f2c;
-    color: white;
-    border-radius: 5px;
+    background-color: #ffffff;
+    color: #333333;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    transition: border-color 0.2s ease;
+}
+
+.stNumberInput > div > div > input:focus {
+    border-color: #2c5364;
+    box-shadow: 0 0 0 2px rgba(44, 83, 100, 0.1);
 }
 
 /* Text area styling */
 .stTextArea > div > div > textarea {
-    background-color: #1a1f2c;
-    color: white;
-    border-radius: 5px;
+    background-color: #ffffff;
+    color: #333333;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    transition: border-color 0.2s ease;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.stTextArea > div > div > textarea:focus {
+    border-color: #2c5364;
+    box-shadow: 0 0 0 2px rgba(44, 83, 100, 0.1);
 }
 
 /* Tooltip styling */
@@ -218,31 +382,212 @@
 
 .tooltip .tooltiptext {
     visibility: hidden;
-    width: 200px;
-    background-color: #1a1f2c;
-    color: white;
+    width: 220px;
+    background-color: #ffffff;
+    color: #333333;
     text-align: center;
-    border-radius: 5px;
-    padding: 5px;
+    border-radius: 6px;
+    padding: 8px 12px;
     position: absolute;
     z-index: 1;
     bottom: 125%;
     left: 50%;
-    margin-left: -100px;
+    margin-left: -110px;
     opacity: 0;
-    transition: opacity 0.3s;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(10px);
+    font-weight: 500;
+    font-size: 0.85rem;
 }
 
 .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
+    transform: translateY(0);
 }
 
 /* Footer styling */
 .footer {
     text-align: center;
-    padding: 1rem;
-    margin-top: 2rem;
-    border-top: 1px solid #2a5298;
+    padding: 1.5rem;
+    margin-top: 2.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    font-size: 0.85rem;
+    color: #666666;
+}
+
+/* Sidebar styling */
+.css-1d391kg {
+    background-color: #f5f7fa;
+}
+
+.css-1d391kg .block-container {
+    padding: 2rem 1rem;
+}
+
+/* Custom sidebar header */
+.sidebar-header {
+    background: linear-gradient(90deg, #2c5364 0%, #203a43 100%);
+    padding: 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.sidebar-header h2 {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.5rem;
+    color: #ffffff;
+}
+
+.sidebar-section {
+    background-color: #ffffff;
+    padding: 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.sidebar-section h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 0.75rem;
+    color: #333333;
+}
+
+/* Trading Controls styling */
+.sidebar div[style*="text-align: center; margin-bottom: 20px;"] h2 {
+    color: #333333;
+    font-weight: 700;
+}
+
+.sidebar div[style*="text-align: center; margin-bottom: 20px;"] p {
+    color: #666666;
+}
+
+/* Section headers in sidebar - Fix for emoji headings */
+.sidebar div[style*="background-color: #1a1f2c"] {
+    background-color: #f0f2f5 !important;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.sidebar div[style*="background-color: #1a1f2c"] h3 {
+    color: #333333 !important;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Specific fix for emoji headings */
+div[style*="background-color: #1a1f2c; padding: 10px; border-radius: 5px; margin-bottom: 20px;"] h3,
+div[style*="background-color: #1a1f2c; padding: 10px; border-radius: 5px; margin-bottom: 20px; margin-top: 20px;"] h3,
+div[style*="background-color: #1a1f2c; padding: 10px; border-radius: 5px; margin-bottom: 20px;"] {
+    color: #333333 !important;
+    background-color: #f0f2f5 !important;
+}
+
+/* System status in sidebar */
+.sidebar div[style*="background-color: #1a1f2c; padding: 10px; border-radius: 5px; margin-top: 20px; text-align: center;"] {
+    background-color: #f0f2f5 !important;
+}
+
+.sidebar div[style*="background-color: #1a1f2c; padding: 10px; border-radius: 5px; margin-top: 20px; text-align: center;"] h4 {
+    color: #333333 !important;
+}
+
+/* Actions section */
+div[style*="background-color: #1a1f2c; padding: 10px; border-radius: 5px; margin-bottom: 20px; margin-top: 20px;"] h3 {
+    color: #333333 !important;
+}
+
+/* Fix for Streamlit text */
+p, h1, h2, h3, h4, h5, h6, li, span, label, div {
+    color: #333333;
+}
+
+.stMarkdown p, .stMarkdown li {
+    color: #333333;
+}
+
+/* Fix for metric labels */
+[data-testid="stMetricLabel"] {
+    color: #666666 !important;
+}
+
+[data-testid="stMetricValue"] {
+    color: #333333 !important;
+    font-weight: 600;
+}
+
+/* Chart styling */
+.js-plotly-plot .plotly .modebar {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 6px;
+}
+
+.js-plotly-plot .plotly .modebar-btn path {
+    fill: rgba(44, 83, 100, 0.7) !important;
+}
+
+.js-plotly-plot .plotly .modebar-btn:hover path {
+    fill: #2c5364 !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f5f7fa;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c9d6;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a3aebf;
+}
+
+/* Override dark theme */
+body {
+    background-color: #ffffff;
+    color: #333333;
+}
+
+/* Override script that sets dark background */
+script {
+    display: none !important;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .dashboard-header {
+        padding: 1rem;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .dashboard-header h3 {
+        font-size: 1rem;
+    }
+    
+    .metric-card {
+        padding: 1rem;
+    }
+    
+    .metric-card h2 {
+        font-size: 1.25rem;
+    }
 }
