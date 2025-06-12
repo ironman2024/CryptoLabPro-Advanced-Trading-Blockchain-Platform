@@ -8,27 +8,42 @@ import random
 from datetime import datetime
 
 class PosAccount:
+    """Account in a PoS system with staking capabilities."""
+    
     def __init__(self, address, balance=0.0, stake=0.0):
+        """Initialize a new account."""
         self.address = address
         self.balance = balance
         self.stake = stake
         self.rewards = 0.0
     
     def get_total_stake(self):
+        """Get total stake amount."""
         return self.stake
     
     def add_stake(self, amount):
+        """Add stake from balance."""
         if amount <= 0 or amount > self.balance:
             return False
         self.balance -= amount
         self.stake += amount
         return True
     
+    def remove_stake(self, amount):
+        """Remove stake and return to balance."""
+        if amount <= 0 or amount > self.stake:
+            return False
+        self.stake -= amount
+        self.balance += amount
+        return True
+    
     def add_reward(self, amount):
+        """Add reward to account."""
         self.rewards += amount
         self.balance += amount
     
     def to_dict(self):
+        """Convert account to dictionary."""
         return {
             "address": self.address,
             "balance": self.balance,
@@ -37,7 +52,10 @@ class PosAccount:
         }
 
 class PosBlock:
+    """Block in a PoS blockchain."""
+    
     def __init__(self, index, previous_hash, validator, timestamp=None, data=""):
+        """Initialize a new PoS block."""
         self.index = index
         self.previous_hash = previous_hash
         self.validator = validator
@@ -46,10 +64,12 @@ class PosBlock:
         self.hash = self.calculate_hash()
     
     def calculate_hash(self):
+        """Calculate block hash."""
         block_string = f"{self.index}{self.previous_hash}{self.validator}{self.timestamp}{self.data}"
         return hashlib.sha256(block_string.encode()).hexdigest()
     
     def to_dict(self):
+        """Convert block to dictionary."""
         return {
             "index": self.index,
             "previous_hash": self.previous_hash,
@@ -60,7 +80,10 @@ class PosBlock:
         }
 
 class PowBlock:
+    """Block in a PoW blockchain."""
+    
     def __init__(self, index, previous_hash, timestamp=None, data="", nonce=0):
+        """Initialize a new PoW block."""
         self.index = index
         self.previous_hash = previous_hash
         self.timestamp = timestamp if timestamp is not None else time.time()
@@ -69,10 +92,12 @@ class PowBlock:
         self.hash = self.calculate_hash()
     
     def calculate_hash(self):
+        """Calculate block hash."""
         block_string = f"{self.index}{self.previous_hash}{self.timestamp}{self.data}{self.nonce}"
         return hashlib.sha256(block_string.encode()).hexdigest()
     
     def to_dict(self):
+        """Convert block to dictionary."""
         return {
             "index": self.index,
             "previous_hash": self.previous_hash,
@@ -128,7 +153,6 @@ def select_validator(accounts):
     
     return None
 
-# Initialize demo data
 def initialize_blockchain_demo():
     """Initialize blockchain demo data."""
     pow_blocks = [PowBlock(0, "0"*64, data="Genesis Block")]
