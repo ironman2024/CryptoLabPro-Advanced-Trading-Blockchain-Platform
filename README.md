@@ -607,9 +607,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **CryptoLab Pro** - *Empowering Traders, Educating Enthusiasts*
 
-[Website](https://cryptolab-pro.com) • [Documentation](https://docs.cryptolab-pro.com) • [Community](https://community.cryptolab-pro.com)
+[Website]([https://cryptolab-pro.com](https://cryptoanalyst.streamlit.app/))
 
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/cryptolab-pro?style=social)](https://github.com/yourusername/cryptolab-pro)
+[![GitHub stars](https://img.shields.io/github/stars/yourusername/cryptolab-pro?style=social)]([https://github.com/yourusername/cryptolab-pro](https://github.com/ironman2024/CryptoLabPro-Advanced-Trading-Blockchain-Platform))
 [![Twitter Follow](https://img.shields.io/twitter/follow/cryptolab_pro?style=social)](https://twitter.com/cryptolab_pro)
 
 </div>
