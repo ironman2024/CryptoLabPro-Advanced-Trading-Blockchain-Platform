@@ -13,8 +13,7 @@
 
 [Features](#-features) • [Installation](#-installation--usage) • [Documentation](#-educational-components) • [Contributing](CONTRIBUTING.md)
 
-![Platform Preview](![image](https://github.com/user-attachments/assets/bc687d16-9f52-40cf-8c9e-17a699077205)
-)
+![Platform Preview](https://github.com/user-attachments/assets/bc687d16-9f52-40cf-8c9e-17a699077205)
 
 </div>
 
