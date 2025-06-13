@@ -166,6 +166,33 @@ class TestAdvancedStrategy(unittest.TestCase):
         self.assertTrue(df['atr'].notna().any())
         self.assertTrue((df['bbands_upper'] > df['bbands_middle']).all())
         self.assertTrue((df['bbands_middle'] > df['bbands_lower']).all())
+        
+        # Test specific indicator values
+        # RSI should be 50 when gains equal losses
+        test_data = pd.DataFrame({
+            'timestamp': pd.date_range(start='2023-01-01', periods=30, freq='H'),
+            'open': [100] * 30,
+            'high': [101] * 30,
+            'low': [99] * 30,
+            'close': [100 + (i % 2) for i in range(30)],  # Alternating 100, 101
+            'volume': [1000] * 30
+        })
+        df_test = self.strategy.calculate_advanced_indicators(test_data)
+        # Allow for small numerical differences
+        self.assertTrue(abs(df_test['rsi'].iloc[-1] - 50.0) < 1e-10)
+        
+        # MACD should be zero when price is constant
+        test_data = pd.DataFrame({
+            'timestamp': pd.date_range(start='2023-01-01', periods=30, freq='H'),
+            'open': [100] * 30,
+            'high': [100] * 30,
+            'low': [100] * 30,
+            'close': [100] * 30,
+            'volume': [1000] * 30
+        })
+        df_test = self.strategy.calculate_advanced_indicators(test_data)
+        # Allow for small numerical differences
+        self.assertTrue(abs(df_test['macd'].iloc[-1]) < 1e-10)
 
     def test_advanced_signal_generation(self):
         """Test advanced trading signal generation."""

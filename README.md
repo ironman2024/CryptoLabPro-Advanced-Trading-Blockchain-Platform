@@ -289,6 +289,32 @@ graph TD
     J[Educational Module] --> H
 ```
 
+### Technical Indicator Implementation
+The platform uses TA-Lib for efficient technical analysis calculations. For enhanced reliability, we implement a fallback mechanism:
+
+1. **Primary Implementation (TA-Lib C Library)**
+   - High-performance C-based calculations
+   - Optimized for speed and efficiency
+   - Automatically installed during setup on supported platforms
+
+2. **Fallback Implementation (Pure Python)**
+   - Automatically used if TA-Lib installation fails
+   - Implements core indicators in pure Python
+   - Same functionality but may be slower
+   - Suitable for environments where TA-Lib cannot be installed
+
+Example of fallback RSI calculation:
+```python
+def RSI(prices, timeperiod=14):
+    delta = prices.diff()
+    gain = delta.where(delta > 0, 0)
+    loss = -delta.where(delta < 0, 0)
+    avg_gain = gain.rolling(window=timeperiod).mean()
+    avg_loss = loss.rolling(window=timeperiod).mean()
+    rs = avg_gain / avg_loss
+    return 100 - (100 / (1 + rs))
+```
+
 ### Advanced Strategy Implementation
 ```python
 from utils.strategy_base import StrategyBase
@@ -390,6 +416,35 @@ class MarketAnalyzer:
 - Git
 - 4GB+ RAM recommended
 - CUDA-compatible GPU (optional, for ML acceleration)
+- TA-Lib C library (required for technical analysis)
+
+### Installing TA-Lib
+
+Before installing the Python requirements, you need to install the TA-Lib C library:
+
+#### On Ubuntu/Debian:
+```bash
+sudo apt-get update
+sudo apt-get install ta-lib
+```
+
+#### On macOS:
+```bash
+brew install ta-lib
+```
+
+#### On Windows:
+Download and install the pre-built TA-Lib library from [here](http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-msvc.zip)
+
+#### From Source:
+```bash
+wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
+tar -xzf ta-lib-0.4.0-src.tar.gz
+cd ta-lib/
+./configure --prefix=/usr
+make
+sudo make install
+```
 
 ### Installation
 
