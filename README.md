@@ -418,9 +418,24 @@ class MarketAnalyzer:
 - CUDA-compatible GPU (optional, for ML acceleration)
 - TA-Lib C library (required for technical analysis)
 
-### Installing TA-Lib
+### Installing TA-Lib and Dependencies
 
-Before installing the Python requirements, you need to install the TA-Lib C library:
+We provide an automated installation script that handles the TA-Lib installation and all other dependencies:
+
+```bash
+# Make the installation script executable
+chmod +x install.sh
+
+# Run the installation script
+./install.sh
+```
+
+The script will automatically:
+1. Install the TA-Lib C library for your operating system
+2. Set up all required Python dependencies
+3. Configure the development environment
+
+If you prefer manual installation, you can install TA-Lib directly:
 
 #### On Ubuntu/Debian:
 ```bash

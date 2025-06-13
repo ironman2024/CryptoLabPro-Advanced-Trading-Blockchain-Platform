@@ -92,30 +92,14 @@ class AdvancedStrategy(Strategy):
         df = df.copy()
         
         try:
-            # Convert to numpy arrays for TA-Lib if using the real library
-            if talib != TALibFallback:
-                close = df['close'].values
-                high = df['high'].values
-                low = df['low'].values
-                volume = df['volume'].values
-                
-                # Momentum Indicators
-                df['rsi'] = talib.RSI(close, timeperiod=14)
-                df['macd'], df['macd_signal'], df['macd_hist'] = talib.MACD(close, fastperiod=12, slowperiod=26, signalperiod=9)
-                df['mom'] = talib.MOM(close, timeperiod=10)
-                
-                # Volatility Indicators
-                df['atr'] = talib.ATR(high, low, close, timeperiod=14)
-                df['bbands_upper'], df['bbands_middle'], df['bbands_lower'] = talib.BBANDS(close, timeperiod=20, nbdevup=2, nbdevdn=2, matype=0)
-            else:
-                # Use fallback implementation with pandas Series
-                df['rsi'] = talib.RSI(df['close'], timeperiod=14)
-                df['macd'], df['macd_signal'], df['macd_hist'] = talib.MACD(df['close'], fastperiod=12, slowperiod=26, signalperiod=9)
-                df['mom'] = talib.MOM(df['close'], timeperiod=10)
-                
-                # Volatility Indicators
-                df['atr'] = talib.ATR(df['high'], df['low'], df['close'], timeperiod=14)
-                df['bbands_upper'], df['bbands_middle'], df['bbands_lower'] = talib.BBANDS(df['close'], timeperiod=20, nbdevup=2, nbdevdn=2)
+            # Use pure Python implementation with pandas Series
+            df['rsi'] = talib.RSI(df['close'], timeperiod=14)
+            df['macd'], df['macd_signal'], df['macd_hist'] = talib.MACD(df['close'], fastperiod=12, slowperiod=26, signalperiod=9)
+            df['mom'] = talib.MOM(df['close'], timeperiod=10)
+            
+            # Volatility Indicators
+            df['atr'] = talib.ATR(df['high'], df['low'], df['close'], timeperiod=14)
+            df['bbands_upper'], df['bbands_middle'], df['bbands_lower'] = talib.BBANDS(df['close'], timeperiod=20, nbdevup=2, nbdevdn=2)
             
         except Exception as e:
             print(f"Error calculating advanced indicators: {e}")

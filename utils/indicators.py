@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from .technical_analysis import MA, RSI, MACD, BBANDS, ATR
 
 class TechnicalIndicators:
     @staticmethod
@@ -8,14 +9,13 @@ class TechnicalIndicators:
         # Moving averages
         windows = [20, 50, 200]
         for window in windows:
-            df[f'sma_{window}'] = df['close'].rolling(window=window).mean()
+            df[f'sma_{window}'] = MA(df['close'], timeperiod=window, matype=0)
             
         # MACD
-        exp1 = df['close'].ewm(span=12, adjust=False).mean()
-        exp2 = df['close'].ewm(span=26, adjust=False).mean()
-        df['macd'] = exp1 - exp2
-        df['macd_signal'] = df['macd'].ewm(span=9, adjust=False).mean()
-        df['macd_hist'] = df['macd'] - df['macd_signal']
+        macd, signal, hist = MACD(df['close'])
+        df['macd'] = macd
+        df['macd_signal'] = signal
+        df['macd_hist'] = hist
         
         return df
 
@@ -23,13 +23,9 @@ class TechnicalIndicators:
     def add_momentum_indicators(df):
         """Calculate momentum-based indicators"""
         # RSI
-        delta = df['close'].diff()
-        gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
-        loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
-        rs = gain / loss
-        df['rsi'] = 100 - (100 / (1 + rs))
+        df['rsi'] = RSI(df['close'])
         
-        # ROC
+        # ROC (Rate of Change - using pandas as it's not in TA-Lib core)
         for period in [12, 24, 48]:
             df[f'roc_{period}'] = df['close'].pct_change(period) * 100
             
@@ -39,16 +35,13 @@ class TechnicalIndicators:
     def add_volatility_indicators(df):
         """Calculate volatility-based indicators"""
         # ATR
-        high_low = df['high'] - df['low']
-        high_cp = np.abs(df['high'] - df['close'].shift())
-        low_cp = np.abs(df['low'] - df['close'].shift())
-        df['tr'] = pd.concat([high_low, high_cp, low_cp], axis=1).max(axis=1)
-        df['atr'] = df['tr'].rolling(window=14).mean()
+        df['atr'] = ATR(df['high'], df['low'], df['close'])
         
         # Bollinger Bands
-        df['bb_middle'] = df['close'].rolling(window=20).mean()
-        df['bb_stddev'] = df['close'].rolling(window=20).std()
-        df['bb_upper'] = df['bb_middle'] + (df['bb_stddev'] * 2)
-        df['bb_lower'] = df['bb_middle'] - (df['bb_stddev'] * 2)
+        upper, middle, lower = BBANDS(df['close'], timeperiod=20)
+        df['bb_upper'] = upper
+        df['bb_middle'] = middle
+        df['bb_lower'] = lower
+        df['bb_stddev'] = (upper - middle) / 2  # Standard deviation can be derived from bands
         
         return df
