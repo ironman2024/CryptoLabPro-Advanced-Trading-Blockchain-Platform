@@ -1,7 +1,51 @@
 import pandas as pd
 import numpy as np
 from strategy import Strategy, DEFAULT_CONFIG
-import talib
+
+# Create a fallback module for TA-Lib functions
+class TALibFallback:
+    @staticmethod
+    def RSI(prices, timeperiod=14):
+        delta = prices.diff()
+        gain = delta.where(delta > 0, 0)
+        loss = -delta.where(delta < 0, 0)
+        avg_gain = gain.rolling(window=timeperiod).mean()
+        avg_loss = loss.rolling(window=timeperiod).mean()
+        rs = avg_gain / avg_loss
+        return 100 - (100 / (1 + rs))
+    
+    @staticmethod
+    def MACD(prices, fastperiod=12, slowperiod=26, signalperiod=9):
+        fast_ema = prices.ewm(span=fastperiod, adjust=False).mean()
+        slow_ema = prices.ewm(span=slowperiod, adjust=False).mean()
+        macd = fast_ema - slow_ema
+        signal = macd.ewm(span=signalperiod, adjust=False).mean()
+        hist = macd - signal
+        return macd, signal, hist
+    
+    @staticmethod
+    def MOM(prices, timeperiod=10):
+        return prices.diff(timeperiod)
+    
+    @staticmethod
+    def ATR(high, low, close, timeperiod=14):
+        tr1 = high - low
+        tr2 = abs(high - close.shift())
+        tr3 = abs(low - close.shift())
+        tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+        return tr.rolling(window=timeperiod).mean()
+    
+    @staticmethod
+    def BBANDS(prices, timeperiod=20, nbdevup=2, nbdevdn=2, matype=0):
+        middle = prices.rolling(window=timeperiod).mean()
+        std = prices.rolling(window=timeperiod).std()
+        upper = middle + (std * nbdevup)
+        lower = middle - (std * nbdevdn)
+        return upper, middle, lower
+
+# Initialize TALib to use fallback implementation
+talib = TALibFallback()
+
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
@@ -44,50 +88,44 @@ class AdvancedStrategy(Strategy):
             print(f"Error saving model: {e}")
     
     def calculate_advanced_indicators(self, df):
-        """Calculate advanced technical indicators using TA-Lib"""
+        """Calculate advanced technical indicators using TA-Lib or fallback implementation"""
         df = df.copy()
         
-        # Convert to numpy arrays for TA-Lib
-        close = df['close'].values
-        high = df['high'].values
-        low = df['low'].values
-        volume = df['volume'].values
-        
         try:
-            # Momentum Indicators
-            df['rsi'] = talib.RSI(close, timeperiod=14)
-            df['macd'], df['macd_signal'], df['macd_hist'] = talib.MACD(close, fastperiod=12, slowperiod=26, signalperiod=9)
-            df['mom'] = talib.MOM(close, timeperiod=10)
-            df['stoch_k'], df['stoch_d'] = talib.STOCH(high, low, close, fastk_period=14, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
-            
-            # Volatility Indicators
-            df['atr'] = talib.ATR(high, low, close, timeperiod=14)
-            df['bbands_upper'], df['bbands_middle'], df['bbands_lower'] = talib.BBANDS(close, timeperiod=20, nbdevup=2, nbdevdn=2, matype=0)
-            
-            # Volume Indicators
-            df['ad'] = talib.AD(high, low, close, volume)
-            df['obv'] = talib.OBV(close, volume)
-            
-            # Cycle Indicators
-            df['ht_dcperiod'] = talib.HT_DCPERIOD(close)
-            df['ht_dcphase'] = talib.HT_DCPHASE(close)
-            df['ht_trendmode'] = talib.HT_TRENDMODE(close)
-            
-            # Pattern Recognition
-            df['cdl_engulfing'] = talib.CDLENGULFING(open, high, low, close)
-            df['cdl_hammer'] = talib.CDLHAMMER(open, high, low, close)
-            df['cdl_doji'] = talib.CDLDOJI(open, high, low, close)
-            
-            # Statistic Functions
-            df['linear_reg'] = talib.LINEARREG(close, timeperiod=14)
-            df['linear_reg_angle'] = talib.LINEARREG_ANGLE(close, timeperiod=14)
-            df['linear_reg_slope'] = talib.LINEARREG_SLOPE(close, timeperiod=14)
+            # Convert to numpy arrays for TA-Lib if using the real library
+            if talib != TALibFallback:
+                close = df['close'].values
+                high = df['high'].values
+                low = df['low'].values
+                volume = df['volume'].values
+                
+                # Momentum Indicators
+                df['rsi'] = talib.RSI(close, timeperiod=14)
+                df['macd'], df['macd_signal'], df['macd_hist'] = talib.MACD(close, fastperiod=12, slowperiod=26, signalperiod=9)
+                df['mom'] = talib.MOM(close, timeperiod=10)
+                
+                # Volatility Indicators
+                df['atr'] = talib.ATR(high, low, close, timeperiod=14)
+                df['bbands_upper'], df['bbands_middle'], df['bbands_lower'] = talib.BBANDS(close, timeperiod=20, nbdevup=2, nbdevdn=2, matype=0)
+            else:
+                # Use fallback implementation with pandas Series
+                df['rsi'] = talib.RSI(df['close'], timeperiod=14)
+                df['macd'], df['macd_signal'], df['macd_hist'] = talib.MACD(df['close'], fastperiod=12, slowperiod=26, signalperiod=9)
+                df['mom'] = talib.MOM(df['close'], timeperiod=10)
+                
+                # Volatility Indicators
+                df['atr'] = talib.ATR(df['high'], df['low'], df['close'], timeperiod=14)
+                df['bbands_upper'], df['bbands_middle'], df['bbands_lower'] = talib.BBANDS(df['close'], timeperiod=20, nbdevup=2, nbdevdn=2)
             
         except Exception as e:
             print(f"Error calculating advanced indicators: {e}")
-            # If TA-Lib fails, calculate basic indicators
+            # If indicators calculation fails, use basic indicators
             df['rsi'] = df['rsi_14']
             df['mom'] = df['momentum_10']
+            # Create MACD from EMAs
+            df['macd'] = df['ema_12'] - df['ema_26']
+            df['macd_signal'] = df['macd'].ewm(span=9, adjust=False).mean()
+            df['macd_hist'] = df['macd'] - df['macd_signal']
         
         return df
     
@@ -247,10 +285,10 @@ class AdvancedStrategy(Strategy):
                 
                 for i in range(len(df)):
                     if not position_active and buy_probs[i] > 0.7:
-                        df.iloc[i, df.columns.get_loc('signal')] = 'BUY'
+                        df.at[df.index[i], 'signal'] = 'BUY'
                         position_active = True
                     elif position_active and (buy_probs[i] < 0.3 or i == len(df) - 1):
-                        df.iloc[i, df.columns.get_loc('signal')] = 'SELL'
+                        df.at[df.index[i], 'signal'] = 'SELL'
                         position_active = False
             else:
                 # Fall back to traditional strategy

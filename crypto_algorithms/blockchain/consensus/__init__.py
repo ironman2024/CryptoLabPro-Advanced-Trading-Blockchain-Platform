@@ -1,0 +1,3 @@
+"""
+Consensus algorithms package
+"""

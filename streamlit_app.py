@@ -17,171 +17,10 @@ from strategy import Strategy, DEFAULT_CONFIG
 from crypto_market_insights import MarketInsights
 from trading_strategies import TradingStrategies
 
-# Define blockchain classes directly to avoid import issues
-# These are simplified versions of the classes in crypto_edu/blockchain/consensus/
-
-# Proof of Stake implementation
-class PosAccount:
-    """Account in a PoS system with staking capabilities."""
-    
-    def __init__(self, address: str, balance: float = 0.0, stake: float = 0.0):
-        self.address = address
-        self.balance = balance
-        self.stake = stake
-        self.delegated_to = None
-        self.delegated_from = {}
-        self.last_stake_time = 0
-        self.unstaking = []
-        self.slashed = 0.0
-        self.rewards = 0.0
-    
-    def get_total_stake(self):
-        delegated_total = sum(self.delegated_from.values())
-        return self.stake + delegated_total
-    
-    def add_stake(self, amount):
-        if amount <= 0 or amount > self.balance:
-            return False
-        self.balance -= amount
-        self.stake += amount
-        self.last_stake_time = time.time()
-        return True
-    
-    def remove_stake(self, amount, lock_period=86400):
-        if amount <= 0 or amount > self.stake:
-            return False
-        self.stake -= amount
-        unlock_time = time.time() + lock_period
-        self.unstaking.append((amount, unlock_time))
-        return True
-    
-    def add_reward(self, amount):
-        self.rewards += amount
-        self.balance += amount
-    
-    def to_dict(self):
-        return {
-            "address": self.address,
-            "balance": self.balance,
-            "stake": self.stake,
-            "total_stake": self.get_total_stake(),
-            "rewards": self.rewards
-        }
-
-class PosBlock:
-    """Block in a PoS blockchain."""
-    
-    def __init__(self, index, previous_hash, validator, timestamp=None, data=""):
-        self.index = index
-        self.previous_hash = previous_hash
-        self.validator = validator
-        self.timestamp = timestamp if timestamp is not None else time.time()
-        self.data = data
-        self.hash = self.calculate_hash()
-        self.signature = ""
-    
-    def calculate_hash(self):
-        block_string = f"{self.index}{self.previous_hash}{self.validator}{self.timestamp}{self.data}"
-        return hashlib.sha256(block_string.encode()).hexdigest()
-    
-    def sign(self, signature):
-        self.signature = signature
-    
-    def to_dict(self):
-        return {
-            "index": self.index,
-            "previous_hash": self.previous_hash,
-            "validator": self.validator,
-            "timestamp": self.timestamp,
-            "data": self.data,
-            "hash": self.hash,
-            "signature": self.signature
-        }
-
-class ProofOfStake:
-    """Proof of Stake consensus implementation."""
-    
-    def __init__(self, minimum_stake=1.0, block_time=5, reward_rate=0.05, slash_rate=0.1):
-        self.minimum_stake = minimum_stake
-        self.block_time = block_time
-        self.reward_rate = reward_rate
-        self.slash_rate = slash_rate
-        self.accounts = {}
-        self.validators = set()
-        self.validator_selection_steps = []
-        self.reward_distribution_steps = []
-    
-    def create_account(self, address, initial_balance=0.0):
-        account = PosAccount(address, initial_balance)
-        self.accounts[address] = account
-        return account
-    
-    def add_stake(self, address, amount):
-        if address not in self.accounts:
-            return False
-        success = self.accounts[address].add_stake(amount)
-        if success and self.accounts[address].get_total_stake() >= self.minimum_stake:
-            self.validators.add(address)
-        return success
-    
-    def select_validator(self, seed=None):
-        if not self.validators:
-            return None, []
-        
-        if seed:
-            random.seed(seed)
-        
-        total_stake = sum(self.accounts[v].get_total_stake() for v in self.validators)
-        r = random.uniform(0, total_stake)
-        
-        cumulative = 0
-        selected = None
-        
-        for validator in self.validators:
-            stake = self.accounts[validator].get_total_stake()
-            cumulative += stake
-            if r <= cumulative:
-                selected = validator
-                break
-        
-        return selected, []
-    
-    def distribute_rewards(self, validator, block_reward):
-        if validator not in self.accounts:
-            return {}
-        
-        validator_account = self.accounts[validator]
-        validator_account.add_reward(block_reward)
-        
-        return {validator: block_reward}
-
-# Proof of Work implementation
-class PowBlock:
-    """Simple block structure for PoW demonstration."""
-    
-    def __init__(self, index, previous_hash, timestamp=None, data="", nonce=0, difficulty=0):
-        self.index = index
-        self.previous_hash = previous_hash
-        self.timestamp = timestamp if timestamp is not None else time.time()
-        self.data = data
-        self.nonce = nonce
-        self.difficulty = difficulty
-        self.hash = self.calculate_hash()
-    
-    def calculate_hash(self):
-        block_string = f"{self.index}{self.previous_hash}{self.timestamp}{self.data}{self.nonce}"
-        return hashlib.sha256(block_string.encode()).hexdigest()
-    
-    def to_dict(self):
-        return {
-            "index": self.index,
-            "previous_hash": self.previous_hash,
-            "timestamp": self.timestamp,
-            "data": self.data,
-            "nonce": self.nonce,
-            "difficulty": self.difficulty,
-            "hash": self.hash
-        }
+# Define blockchain helper functions
+def calculate_hash(index, previous_hash, timestamp, data, nonce=""):
+    block_string = f"{index}{previous_hash}{timestamp}{data}{nonce}"
+    return hashlib.sha256(block_string.encode()).hexdigest()
 
 class ProofOfWork:
     """Proof of Work consensus implementation."""
@@ -513,44 +352,11 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 # Import blockchain components
-try:
-    from blockchain_components import (
-        PowBlock, PosBlock, PosAccount, 
-        mine_pow_block, create_pos_block, select_validator,
-        initialize_blockchain_demo
-    )
-except ImportError:
-    # Define minimal versions of the classes if import fails
-    class PowBlock:
-        def __init__(self, index, previous_hash, timestamp=None, data="", nonce=0):
-            self.index = index
-            self.previous_hash = previous_hash
-            self.data = data
-            self.nonce = nonce
-            self.hash = f"hash_{index}"
-        def to_dict(self):
-            return {"index": self.index, "data": self.data, "hash": self.hash}
-    
-    class PosBlock:
-        def __init__(self, index, previous_hash, validator, timestamp=None, data=""):
-            self.index = index
-            self.previous_hash = previous_hash
-            self.validator = validator
-            self.data = data
-            self.hash = f"hash_{index}"
-        def to_dict(self):
-            return {"index": self.index, "validator": self.validator, "data": self.data}
-    
-    class PosAccount:
-        def __init__(self, address, balance=0.0, stake=0.0):
-            self.address = address
-            self.balance = balance
-            self.stake = stake
-        def to_dict(self):
-            return {"address": self.address, "balance": self.balance, "stake": self.stake}
-    
-    def initialize_blockchain_demo():
-        return [PowBlock(0, "0", data="Genesis")], [PosBlock(0, "0", "Genesis")], {"Demo": PosAccount("Demo", 100, 10)}
+from blockchain_components import (
+    mine_pow_block, create_pos_block, select_validator,
+    initialize_blockchain_demo, PowBlock, PosBlock, PosAccount
+)
+# Use blockchain_components classes directly
 
 # Initialize blockchain demo data in session state
 if 'pow_blocks' not in st.session_state:
@@ -558,6 +364,14 @@ if 'pow_blocks' not in st.session_state:
     st.session_state.pow_blocks = pow_blocks
     st.session_state.pos_blocks = pos_blocks
     st.session_state.pos_accounts = pos_accounts
+    
+# Initialize mine_pow_block and create_pos_block if not available
+if 'mine_pow_block' not in globals():
+    mine_pow_block = lambda prev, data, diff: (PowBlock(prev.index + 1, prev.hash, data=data, nonce=1234), 1234)
+if 'create_pos_block' not in globals():
+    create_pos_block = lambda prev, validator, data: PosBlock(prev.index + 1, prev.hash, validator, data=data)
+if 'select_validator' not in globals():
+    select_validator = lambda accounts: list(accounts.keys())[0] if accounts else None
 
 # Main tabs
 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
@@ -625,22 +439,31 @@ with tab1:
         if "error" not in insights:
             # Market sentiment
             st.subheader("Market Sentiment")
-            sentiment = insights["sentiment"]["overall"]
+            # Safely access nested dictionary values with type checking
+            sentiment_data = insights.get("sentiment", {}) if isinstance(insights, dict) else {}
+            sentiment_data = sentiment_data if isinstance(sentiment_data, dict) else {}
+            sentiment: str = sentiment_data.get("overall", "Unknown") if isinstance(sentiment_data, dict) else "Unknown"
             sentiment_color = "green" if sentiment in ["Strongly Bullish", "Bullish"] else "red" if sentiment in ["Strongly Bearish", "Bearish"] else "gray"
             st.markdown(f"<h3 style='color: {sentiment_color};'>{sentiment}</h3>", unsafe_allow_html=True)
             
-            # Support and resistance
+            # Support and resistance with safe dictionary access
             st.subheader("Support and Resistance Levels")
             col1, col2 = st.columns(2)
-            col1.metric("Resistance", f"${insights['support_resistance']['resistance']:.4f}")
-            col2.metric("Support", f"${insights['support_resistance']['support']:.4f}")
+            support_resistance = insights.get("support_resistance", {}) if isinstance(insights, dict) else {}
+            support_resistance = support_resistance if isinstance(support_resistance, dict) else {}
+            resistance: float = float(support_resistance.get("resistance", 0.0)) if isinstance(support_resistance, dict) else 0.0
+            support: float = float(support_resistance.get("support", 0.0)) if isinstance(support_resistance, dict) else 0.0
+            col1.metric("Resistance", f"${resistance:.4f}")
+            col2.metric("Support", f"${support:.4f}")
             
-            # Recent price action summary
+            # Recent price action summary with safe dictionary access
             st.subheader("Market Analysis")
-            st.markdown(f"• **Technical Signals:** {insights['technical_signals']['overall']}")
-            st.markdown(f"• **EMA Signal:** {insights['technical_signals']['ema_short']}")
-            st.markdown(f"• **RSI Signal:** {insights['technical_signals']['rsi']}")
-            st.markdown(f"• **MACD Signal:** {insights['technical_signals']['macd']}")
+            technical_signals = insights.get("technical_signals", {}) if isinstance(insights, dict) else {}
+            technical_signals = technical_signals if isinstance(technical_signals, dict) else {}
+            st.markdown(f"• **Technical Signals:** {technical_signals.get('overall', 'N/A') if isinstance(technical_signals, dict) else 'N/A'}")
+            st.markdown(f"• **EMA Signal:** {technical_signals.get('ema_short', 'N/A') if isinstance(technical_signals, dict) else 'N/A'}")
+            st.markdown(f"• **RSI Signal:** {technical_signals.get('rsi', 'N/A') if isinstance(technical_signals, dict) else 'N/A'}")
+            st.markdown(f"• **MACD Signal:** {technical_signals.get('macd', 'N/A') if isinstance(technical_signals, dict) else 'N/A'}")
         else:
             st.error(f"Error getting market insights: {insights['error']}")
     else:
@@ -734,16 +557,21 @@ with tab2:
             ), row=2, col=1)
             
             # Add RSI levels
-            fig.add_shape(
-                type="line", line_color="red", line_width=1, opacity=0.3,
-                x0=target_data['timestamp'].iloc[0], x1=target_data['timestamp'].iloc[-1], y0=overbought, y1=overbought,
-                row=2, col=1
-            )
-            
-            fig.add_shape(
-                type="line", line_color="green", line_width=1, opacity=0.3,
-                x0=target_data['timestamp'].iloc[0], x1=target_data['timestamp'].iloc[-1], y0=oversold, y1=oversold,
-                row=2, col=1
+            fig.update_layout(
+                shapes=[
+                    dict(
+                        type="line", line_color="red", line_width=1, opacity=0.3,
+                        x0=target_data['timestamp'].iloc[0], x1=target_data['timestamp'].iloc[-1], 
+                        y0=overbought, y1=overbought,
+                        xref='x2', yref='y2'
+                    ),
+                    dict(
+                        type="line", line_color="green", line_width=1, opacity=0.3,
+                        x0=target_data['timestamp'].iloc[0], x1=target_data['timestamp'].iloc[-1], 
+                        y0=oversold, y1=oversold,
+                        xref='x2', yref='y2'
+                    )
+                ]
             )
             
         else:
@@ -777,24 +605,38 @@ with tab2:
         sell_signals = signals[signals['signal'] == 'SELL']
         
         if not buy_signals.empty:
-            buy_prices = [target_data.loc[target_data['timestamp'] == ts, 'close'].values[0] for ts in buy_signals['timestamp']]
-            fig.add_trace(go.Scatter(
-                x=buy_signals['timestamp'],
-                y=buy_prices,
-                mode='markers',
-                marker=dict(symbol='triangle-up', size=10, color='green'),
-                name="Buy Signal"
-            ), row=1, col=1)
+            # Safely get buy prices with type checking
+            buy_prices = []
+            for ts in buy_signals['timestamp']:
+                matching_data = target_data[target_data['timestamp'] == ts]
+                if not matching_data.empty and isinstance(matching_data['close'], pd.Series):
+                    buy_prices.append(matching_data['close'].iloc[0])
+            
+            if buy_prices:
+                fig.add_trace(go.Scatter(
+                    x=buy_signals['timestamp'],
+                    y=buy_prices,
+                    mode='markers',
+                    marker=dict(symbol='triangle-up', size=10, color='green'),
+                    name="Buy Signal"
+                ), row=1, col=1)
         
         if not sell_signals.empty:
-            sell_prices = [target_data.loc[target_data['timestamp'] == ts, 'close'].values[0] for ts in sell_signals['timestamp']]
-            fig.add_trace(go.Scatter(
-                x=sell_signals['timestamp'],
-                y=sell_prices,
-                mode='markers',
-                marker=dict(symbol='triangle-down', size=10, color='red'),
-                name="Sell Signal"
-            ), row=1, col=1)
+            # Safely get sell prices with type checking
+            sell_prices = []
+            for ts in sell_signals['timestamp']:
+                matching_data = target_data[target_data['timestamp'] == ts]
+                if not matching_data.empty and isinstance(matching_data['close'], pd.Series):
+                    sell_prices.append(matching_data['close'].iloc[0])
+            
+            if sell_prices:
+                fig.add_trace(go.Scatter(
+                    x=sell_signals['timestamp'],
+                    y=sell_prices,
+                    mode='markers',
+                    marker=dict(symbol='triangle-down', size=10, color='red'),
+                    name="Sell Signal"
+                ), row=1, col=1)
         
         # Update layout
         fig.update_layout(
@@ -1074,27 +916,15 @@ with tab6:
                     # Mine the block
                     previous_block = st.session_state.pow_blocks[-1]
                     
-                    # Check if we're using the minimal version
-                    if hasattr(previous_block, 'calculate_hash'):
-                        new_block, nonce = mine_pow_block(previous_block, pow_data, difficulty)
-                        
-                        if new_block:
-                            st.session_state.pow_blocks.append(new_block)
-                            st.success(f"Block #{new_block.index} mined successfully with nonce {nonce}!")
-                            st.balloons()
-                        else:
-                            st.error("Mining failed. Try reducing the difficulty.")
-                    else:
-                        # Simplified version for minimal implementation
-                        new_block = PowBlock(
-                            index=previous_block.index + 1,
-                            previous_hash=previous_block.hash,
-                            data=pow_data,
-                            nonce=1234
-                        )
+                    # Mine the block
+                    new_block, nonce = mine_pow_block(previous_block, pow_data, difficulty)
+                    
+                    if new_block:
                         st.session_state.pow_blocks.append(new_block)
-                        st.success(f"Block #{new_block.index} mined successfully!")
+                        st.success(f"Block #{new_block.index} mined successfully with nonce {nonce}!")
                         st.balloons()
+                    else:
+                        st.error("Mining failed. Try reducing the difficulty.")
                 except Exception as e:
                     st.error(f"Error mining block: {str(e)}")
         
@@ -1176,19 +1006,11 @@ with tab6:
                 try:
                     account = st.session_state.pos_accounts[account_name]
                     
-                    if hasattr(account, 'add_stake') and callable(account.add_stake):
-                        if account.add_stake(stake_amount):
-                            st.success(f"{account_name} staked {stake_amount} coins successfully!")
-                        else:
-                            st.error(f"Failed to stake. Insufficient balance.")
+                    # Stake coins
+                    if account.add_stake(stake_amount):
+                        st.success(f"{account_name} staked {stake_amount} coins successfully!")
                     else:
-                        # Simplified version for minimal implementation
-                        if account.balance >= stake_amount:
-                            account.balance -= stake_amount
-                            account.stake += stake_amount
-                            st.success(f"{account_name} staked {stake_amount} coins successfully!")
-                        else:
-                            st.error(f"Failed to stake. Insufficient balance.")
+                        st.error(f"Failed to stake. Insufficient balance.")
                 except Exception as e:
                     st.error(f"Error staking coins: {str(e)}")
         
@@ -1208,28 +1030,15 @@ with tab6:
         if create_block:
             try:
                 # Check if we're using the minimal version
-                if 'select_validator' in globals() and callable(select_validator):
-                    # Select validator based on stake
-                    validator = select_validator(st.session_state.pos_accounts)
-                else:
-                    # Simplified version for minimal implementation
-                    validators = list(st.session_state.pos_accounts.keys())
-                    validator = validators[0] if validators else None
+                # Select validator based on stake
+                validator = select_validator(st.session_state.pos_accounts)
                 
                 if validator:
                     # Create block
                     previous_block = st.session_state.pos_blocks[-1]
                     
-                    if 'create_pos_block' in globals() and callable(create_pos_block):
-                        new_block = create_pos_block(previous_block, validator, pos_data)
-                    else:
-                        # Simplified version for minimal implementation
-                        new_block = PosBlock(
-                            index=previous_block.index + 1,
-                            previous_hash=previous_block.hash,
-                            validator=validator,
-                            data=pos_data
-                        )
+                    # Create a new PoS block
+                    new_block = create_pos_block(previous_block, validator, pos_data)
                     
                     # Add block
                     st.session_state.pos_blocks.append(new_block)
@@ -1238,10 +1047,8 @@ with tab6:
                     reward = 1.0  # 1 coin reward
                     validator_account = st.session_state.pos_accounts[validator]
                     
-                    if hasattr(validator_account, 'add_reward'):
-                        validator_account.add_reward(reward)
-                    else:
-                        validator_account.balance += reward
+                    # Add reward to validator
+                    validator_account.add_reward(reward)
                     
                     st.success(f"Block #{new_block.index} created by validator {validator}!")
                     st.balloons()

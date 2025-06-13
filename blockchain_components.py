@@ -17,10 +17,6 @@ class PosAccount:
         self.stake = stake
         self.rewards = 0.0
     
-    def get_total_stake(self):
-        """Get total stake amount."""
-        return self.stake
-    
     def add_stake(self, amount):
         """Add stake from balance."""
         if amount <= 0 or amount > self.balance:
@@ -29,6 +25,15 @@ class PosAccount:
         self.stake += amount
         return True
     
+    def add_reward(self, amount):
+        """Add reward to account."""
+        self.rewards += amount
+        self.balance += amount
+    
+    def get_total_stake(self):
+        """Get total stake amount."""
+        return self.stake
+    
     def remove_stake(self, amount):
         """Remove stake and return to balance."""
         if amount <= 0 or amount > self.stake:
@@ -36,11 +41,6 @@ class PosAccount:
         self.stake -= amount
         self.balance += amount
         return True
-    
-    def add_reward(self, amount):
-        """Add reward to account."""
-        self.rewards += amount
-        self.balance += amount
     
     def to_dict(self):
         """Convert account to dictionary."""
@@ -82,13 +82,14 @@ class PosBlock:
 class PowBlock:
     """Block in a PoW blockchain."""
     
-    def __init__(self, index, previous_hash, timestamp=None, data="", nonce=0):
+    def __init__(self, index, previous_hash, timestamp=None, data="", nonce=0, difficulty=3):
         """Initialize a new PoW block."""
         self.index = index
         self.previous_hash = previous_hash
         self.timestamp = timestamp if timestamp is not None else time.time()
         self.data = data
         self.nonce = nonce
+        self.difficulty = difficulty
         self.hash = self.calculate_hash()
     
     def calculate_hash(self):
@@ -104,6 +105,7 @@ class PowBlock:
             "timestamp": datetime.fromtimestamp(self.timestamp).strftime('%Y-%m-%d %H:%M:%S'),
             "data": self.data,
             "nonce": self.nonce,
+            "difficulty": self.difficulty,
             "hash": self.hash
         }
 
@@ -112,7 +114,8 @@ def mine_pow_block(previous_block, data, difficulty=3):
     new_block = PowBlock(
         index=previous_block.index + 1,
         previous_hash=previous_block.hash,
-        data=data
+        data=data,
+        difficulty=difficulty
     )
     
     target = '0' * difficulty

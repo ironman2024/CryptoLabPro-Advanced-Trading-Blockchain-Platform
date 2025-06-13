@@ -413,13 +413,14 @@ def backtest_strategy():
         sol = pd.read_csv(sol_file)
         has_sol = True
     except:
+        sol = None  # Initialize sol to None to avoid unbound variable
         has_sol = False
 
     # Parse timestamps
     ldo['timestamp'] = pd.to_datetime(ldo['timestamp'])
     btc['timestamp'] = pd.to_datetime(btc['timestamp'])
     eth['timestamp'] = pd.to_datetime(eth['timestamp'])
-    if has_sol:
+    if has_sol and sol is not None:
         sol['timestamp'] = pd.to_datetime(sol['timestamp'])
 
     # Prepare anchor DataFrame
@@ -435,7 +436,7 @@ def backtest_strategy():
     }), on='timestamp', how='inner')
     
     # Add SOL data if available
-    if has_sol:
+    if has_sol and sol is not None:
         anchor = pd.merge(anchor, pd.DataFrame({
             'timestamp': sol['timestamp'],
             'close_SOL': sol['close'],
@@ -473,7 +474,7 @@ def backtest_strategy():
     market_phase = "neutral"  # Can be "bullish", "bearish", or "neutral"
     
     # Calculate market phase based on recent performance
-    if len(ldo) > 50:
+    if isinstance(ldo, pd.DataFrame) and len(ldo) > 50:
         recent_returns = ldo['close'].pct_change(20).iloc[-20:]
         if recent_returns.mean() > 0.02:
             market_phase = "bullish"
@@ -484,6 +485,9 @@ def backtest_strategy():
     leverage_factor = 1.5  # Higher base leverage
     if market_phase == "bullish":
         leverage_factor = 2.0  # Higher leverage in bullish markets
+        
+    # Initialize entry_time to avoid unbound variable
+    entry_time = None
     
     # Enhanced position sizing with Kelly criterion
     kelly_fraction = 0.5  # Conservative Kelly fraction
@@ -497,17 +501,17 @@ def backtest_strategy():
         
         if position == 0 and signal == 'BUY':
             # Adaptive position sizing based on market conditions and past performance
-            if i > 20:
+            if isinstance(i, int) and i > 20:
                 # Calculate win rate and average win/loss for Kelly criterion
                 if len(trade_returns) >= 5:
                     recent_trades = trade_returns[-5:]
                     win_rate = sum(1 for r in recent_trades if r > 0) / len(recent_trades)
-                    avg_win = np.mean([r for r in recent_trades if r > 0]) if any(r > 0 for r in recent_trades) else 0.05
-                    avg_loss = abs(np.mean([r for r in recent_trades if r <= 0])) if any(r <= 0 for r in recent_trades) else 0.03
+                    avg_win = float(np.mean([r for r in recent_trades if r > 0])) if any(r > 0 for r in recent_trades) else 0.05
+                    avg_loss = float(abs(np.mean([r for r in recent_trades if r <= 0]))) if any(r <= 0 for r in recent_trades) else 0.03
                     
                     # Kelly formula: f* = p - (1-p)/R where p=win rate, R=win/loss ratio
                     win_loss_ratio = avg_win / avg_loss if avg_loss > 0 else 1
-                    kelly_size = win_rate - (1 - win_rate) / win_loss_ratio
+                    kelly_size = float(win_rate - (1 - win_rate) / win_loss_ratio)
                     kelly_size = max(0.1, min(kelly_size * kelly_fraction, 1.0))
                 else:
                     kelly_size = 0.5  # Default size
@@ -595,9 +599,9 @@ def backtest_strategy():
     
     # Improved Sharpe calculation
     if len(trade_returns) > 1:
-        sharpe = np.mean(trade_returns) / (np.std(trade_returns) + 1e-8) * np.sqrt(252*24)
+        sharpe = float(np.mean(trade_returns) / (np.std(trade_returns) + 1e-8) * np.sqrt(252*24))
     else:
-        sharpe = 0
+        sharpe = 0.0
     sharpe_score = min(max(sharpe / 2 * 35, 0), 35)
     
     max_drawdown = max(drawdowns) if drawdowns else 0
@@ -612,7 +616,7 @@ def backtest_strategy():
     
     avg_win = np.mean(winning_trades) if winning_trades else 0
     avg_loss = np.mean(losing_trades) if losing_trades else 0
-    profit_factor = abs(avg_win * len(winning_trades) / (avg_loss * len(losing_trades))) if losing_trades and avg_loss != 0 else float('inf')
+    profit_factor = float(abs(avg_win * len(winning_trades) / (avg_loss * len(losing_trades)))) if losing_trades and avg_loss != 0 else float('inf')
 
     print(f"=== PERFORMANCE METRICS ===")
     print(f"Total Return: {total_return*100:.2f}%")
@@ -630,8 +634,8 @@ def backtest_strategy():
     print(f"Average Win: {avg_win*100:.2f}%")
     print(f"Average Loss: {avg_loss*100:.2f}%")
     print(f"Profit Factor: {profit_factor:.2f}")
-    print(f"Best Trade: {max(trade_returns)*100:.2f}%")
-    print(f"Worst Trade: {min(trade_returns)*100:.2f}%\n")
+    print(f"Best Trade: {float(max(trade_returns))*100:.2f}%")
+    print(f"Worst Trade: {float(min(trade_returns))*100:.2f}%\n")
     
     print("=== CHALLENGE REQUIREMENTS ===")
     print(f"Profitability: {'PASS' if profitability_score >= 15 else 'FAIL'} (>= 15, current: {profitability_score:.2f})")

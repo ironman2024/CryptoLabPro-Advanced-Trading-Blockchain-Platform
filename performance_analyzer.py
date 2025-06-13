@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import os
 
@@ -138,15 +138,15 @@ class PerformanceAnalyzer:
     def plot_monthly_returns(self, equity_curve, timestamps):
         """Plot monthly returns heatmap"""
         if isinstance(equity_curve, list):
-            equity_series = pd.Series(equity_curve, index=timestamps)
+            equity_series = pd.Series(equity_curve, index=pd.DatetimeIndex(timestamps))
         else:
-            equity_series = pd.Series(equity_curve.values, index=timestamps)
+            equity_series = pd.Series(equity_curve.values, index=pd.DatetimeIndex(timestamps))
         
         # Calculate daily returns
         daily_returns = equity_series.pct_change().dropna()
         
         # Group by month and calculate monthly returns
-        monthly_returns = daily_returns.groupby([daily_returns.index.year, daily_returns.index.month]).apply(lambda x: (1 + x).prod() - 1)
+        monthly_returns = daily_returns.groupby([lambda x: x.year, lambda x: x.month]).apply(lambda x: (1 + x).prod() - 1)
         monthly_returns = monthly_returns.unstack()
         
         # Plot heatmap
@@ -219,7 +219,8 @@ if __name__ == "__main__":
     # Sample equity curve
     equity_curve = [10000]
     for i in range(100):
-        equity_curve.append(equity_curve[-1] * (1 + np.random.normal(0.001, 0.01)))
+        # Convert to int to avoid type error
+        equity_curve.append(int(equity_curve[-1] * (1 + np.random.normal(0.001, 0.01))))
     
     # Sample trades
     trades = []

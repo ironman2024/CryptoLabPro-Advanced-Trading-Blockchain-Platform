@@ -8,6 +8,49 @@ from crypto_algorithms.blockchain.block import Block, Transaction, MerkleTree
 from crypto_algorithms.blockchain.chain import Blockchain
 from crypto_algorithms.blockchain.consensus.pow import ProofOfWork
 from crypto_algorithms.blockchain.consensus.pos import ProofOfStake
+from blockchain_components import PowBlock, PosBlock, PosAccount, mine_pow_block, create_pos_block, select_validator
+
+def test_pos_account():
+    """Test PosAccount functionality."""
+    # Test initialization
+    account = PosAccount("test_address", balance=1000.0, stake=100.0)
+    assert account.address == "test_address"
+    assert account.balance == 1000.0
+    assert account.stake == 100.0
+    assert account.rewards == 0.0
+
+    # Test add_stake
+    assert account.add_stake(200.0)
+    assert account.balance == 800.0
+    assert account.stake == 300.0
+    
+    # Test invalid stake amount
+    assert not account.add_stake(1000.0)  # More than balance
+    assert not account.add_stake(-100.0)  # Negative amount
+    
+    # Test remove_stake
+    assert account.remove_stake(100.0)
+    assert account.balance == 900.0
+    assert account.stake == 200.0
+    
+    # Test invalid unstake amount
+    assert not account.remove_stake(300.0)  # More than staked
+    assert not account.remove_stake(-50.0)  # Negative amount
+    
+    # Test add_reward
+    account.add_reward(50.0)
+    assert account.rewards == 50.0
+    assert account.balance == 950.0
+    
+    # Test get_total_stake
+    assert account.get_total_stake() == 200.0
+    
+    # Test to_dict
+    account_dict = account.to_dict()
+    assert account_dict["address"] == "test_address"
+    assert account_dict["balance"] == 950.0
+    assert account_dict["stake"] == 200.0
+    assert account_dict["rewards"] == 50.0
 
 def test_transaction():
     """Test transaction functionality."""

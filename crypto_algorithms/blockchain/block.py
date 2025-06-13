@@ -154,6 +154,7 @@ class BlockHeader:
     timestamp: int
     difficulty_target: int
     nonce: int
+    height: int = 0  # Added height attribute with default value
     
     def to_dict(self) -> dict:
         """Convert header to dictionary."""
@@ -163,12 +164,16 @@ class BlockHeader:
             'merkle_root': self.merkle_root,
             'timestamp': self.timestamp,
             'difficulty_target': self.difficulty_target,
-            'nonce': self.nonce
+            'nonce': self.nonce,
+            'height': self.height  # Include height in dictionary
         }
     
     @classmethod
     def from_dict(cls, data: dict) -> 'BlockHeader':
         """Create header from dictionary."""
+        # Ensure height is included in the data
+        if 'height' not in data:
+            data['height'] = 0
         return cls(**data)
     
     def get_hash(self) -> str:
@@ -279,39 +284,3 @@ class Block:
         block.state_root = data['state_root']
         block.receipts_root = data['receipts_root']
         return block
-
-# Example usage and tests
-if __name__ == "__main__":
-    # Create a block
-    block = Block(version=1)
-    
-    # Add some transactions
-    transactions = [
-        Transaction("Alice", "Bob", 1.0, 0.1, 1),
-        Transaction("Bob", "Charlie", 0.5, 0.1, 1),
-        Transaction("Charlie", "Alice", 0.25, 0.1, 1)
-    ]
-    
-    for tx in transactions:
-        block.add_transaction(tx)
-    
-    # Mine the block
-    print("Mining block...")
-    block.mine(4)  # Require 4 leading zeros
-    print(f"Block mined with nonce: {block.header.nonce}")
-    print(f"Block hash: {block.get_hash()}")
-    
-    # Verify the block
-    print(f"Block is valid: {block.verify()}")
-    
-    # Demonstrate Merkle proofs
-    print("\nMerkle Tree Demonstration:")
-    tx = transactions[1]  # Second transaction
-    tx_hash = tx.get_hash()
-    merkle_proof = MerkleTree.get_proof(transactions, 1)
-    merkle_root = block.header.merkle_root
-    
-    print(f"Transaction hash: {tx_hash}")
-    print(f"Merkle root: {merkle_root}")
-    print(f"Proof: {merkle_proof}")
-    print(f"Proof verifies: {MerkleTree.verify_proof(tx_hash, merkle_proof, merkle_root)}")
