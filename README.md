@@ -13,7 +13,8 @@
 
 [Features](#-features) • [Installation](#-installation--usage) • [Documentation](#-educational-components) • [Contributing](CONTRIBUTING.md)
 
-![Platform Preview](https://via.placeholder.com/800x400?text=CryptoLab+Pro+Dashboard)
+![Platform Preview](![image](https://github.com/user-attachments/assets/bc687d16-9f52-40cf-8c9e-17a699077205)
+)
 
 </div>
 
